@@ -18,6 +18,9 @@ from pandas import DataFrame
 column_names = ['MONEYFLOW']
 money_flow_ratio = pd.DataFrame(columns=column_names)
 
+#=================================================================
+# Money Flow Index calculations
+#=================================================================
 def CalculateMFI(bhavcopy_files):
     column_names = ['CLOSE']
     close_price_df = pd.DataFrame(columns=column_names)
@@ -82,10 +85,17 @@ def CalculateMFI(bhavcopy_files):
             sum_positive_mf = sum_positive_mf + positive_money_flow_df
             sum_negative_mf = sum_negative_mf + negative_money_flow_df
 
-    money_flow_ratio = sum_positive_mf/sum_negative_mf
-    money_flow_ratio = money_flow_ratio.dropna()
-    return money_flow_ratio
+        #for row_ind in close_price_df_daybefore_df.index:
+        #print(sum_negative_mf)
+        money_flow_ratio = (sum_positive_mf/sum_negative_mf.where(sum_negative_mf != 0, np.nan))
+        money_flow_ratio = money_flow_ratio.dropna()
+
+
+    #print(money_flow_ratio)
+    #print("money flow done")
     print("money flow done")
+    return money_flow_ratio
+
 
 def CalculateMACD(bhavcopy_files):
     ema_const_9 = 2 / (9 + 1)
@@ -166,7 +176,7 @@ def CalculateMACD(bhavcopy_files):
                 if(histogram_val.at[val, 'CLOSE'] > 0.50 and mfi < 65.0):
                     print('Trade:' + str(val) + ": " + str(histogram_val.at[val, 'CLOSE']) + " MFI: " + str(mfi))
 
-    print()
+    print("=================================================================")
     print("Those may start movement in positive direction")
     for val in hist_index:
         if val in money_flow_ratio.index:
@@ -246,8 +256,8 @@ def CalculateTodaysHammersInDayChart(bhavcopy_files):
             print("\n Today's Confirmation for Day Before Yesterday's hammers: ")
             frame = [positive_stocks, day2_old_Hammer]
             result = pd.concat(frame, axis=1, join="inner")
-            print(result)
-
+            #print(result)
+            print("=================================================================")
             print("\nToday hammer formed for: ")
             positive_stocks = positive_stocks[result_bool]
             print(positive_stocks)
